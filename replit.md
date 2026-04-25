@@ -12,7 +12,7 @@ Kings Player is a gaming marketplace (similar to Eldorado.gg) where users can bu
 - **TypeScript version**: 5.9
 - **Frontend**: React + Vite (`artifacts/kings-player`) — dark gaming theme (slate+gold)
 - **API framework**: Express 5 (`artifacts/api-server`)
-- **Database**: PostgreSQL + Drizzle ORM (`lib/db`)
+- **Database**: Turso (LibSQL/SQLite) + Drizzle ORM (`lib/db`) — migrated from Replit PostgreSQL
 - **Auth**: Clerk (`@clerk/react` v6, `@clerk/express`) with proxy at `/api/__clerk`
 - **Validation**: Zod (`zod/v4`), `drizzle-zod`
 - **API codegen**: Orval (from OpenAPI spec in `lib/api-spec/openapi.yaml`)

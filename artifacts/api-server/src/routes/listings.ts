@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { eq, desc, asc, and, gte, lte, ilike, or, sql } from "drizzle-orm";
+import { eq, desc, asc, and, gte, lte, like, or, sql } from "drizzle-orm";
 import { db, listingsTable, usersTable } from "@workspace/db";
 import {
   GetListingsQueryParams,
@@ -44,19 +44,20 @@ router.get("/listings", async (req, res): Promise<void> => {
     conditions.push(eq(listingsTable.game, game));
   }
   if (search) {
+    const term = `%${search}%`;
     conditions.push(
       or(
-        ilike(listingsTable.title, `%${search}%`),
-        ilike(listingsTable.description, `%${search}%`),
-        ilike(listingsTable.game, `%${search}%`)
+        like(sql`lower(${listingsTable.title})`, term.toLowerCase()),
+        like(sql`lower(${listingsTable.description})`, term.toLowerCase()),
+        like(sql`lower(${listingsTable.game})`, term.toLowerCase())
       )!
     );
   }
   if (minPrice != null) {
-    conditions.push(gte(listingsTable.price, String(minPrice)));
+    conditions.push(gte(listingsTable.price, minPrice));
   }
   if (maxPrice != null) {
-    conditions.push(lte(listingsTable.price, String(maxPrice)));
+    conditions.push(lte(listingsTable.price, maxPrice));
   }
 
   let orderBy;
@@ -100,7 +101,7 @@ router.post("/listings", requireAuth, async (req, res): Promise<void> => {
     .insert(listingsTable)
     .values({
       ...parsed.data,
-      price: String(parsed.data.price),
+      price: Number(parsed.data.price),
       sellerClerkId: userId,
       sellerUsername: seller?.username ?? null,
       sellerAvatarUrl: seller?.avatarUrl ?? null,
@@ -174,7 +175,7 @@ router.patch("/listings/:id", requireAuth, async (req, res): Promise<void> => {
 
   const updateData: Record<string, unknown> = { ...parsed.data };
   if (parsed.data.price != null) {
-    updateData.price = String(parsed.data.price);
+    updateData.price = Number(parsed.data.price);
   }
 
   const [updated] = await db
@@ -214,7 +215,7 @@ router.delete("/listings/:id", requireAuth, async (req, res): Promise<void> => {
 
   await db
     .update(usersTable)
-    .set({ listingCount: sql`GREATEST(${usersTable.listingCount} - 1, 0)` })
+    .set({ listingCount: sql`MAX(${usersTable.listingCount} - 1, 0)` })
     .where(eq(usersTable.clerkId, userId));
 
   res.sendStatus(204);
@@ -237,8 +238,8 @@ function mapListing(l: typeof listingsTable.$inferSelect) {
     commentCount: l.commentCount,
     status: l.status,
     featured: l.featured,
-    createdAt: l.createdAt.toISOString(),
-    updatedAt: l.updatedAt.toISOString(),
+    createdAt: l.createdAt,
+    updatedAt: l.updatedAt,
   };
 }
 

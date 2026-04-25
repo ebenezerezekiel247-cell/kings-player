@@ -37,7 +37,6 @@ router.get("/users/me", requireAuth, async (req, res): Promise<void> => {
   const userId = (req as any).userId as string;
   const user = await ensureUser(userId);
 
-  // Sync avatar URL from Clerk in the background if missing
   if (!user.avatarUrl) {
     const avatarUrl = await syncClerkAvatar(userId);
     if (avatarUrl) {
@@ -64,7 +63,6 @@ router.patch("/users/me", requireAuth, async (req, res): Promise<void> => {
   const userId = (req as any).userId as string;
   await ensureUser(userId);
 
-  // Also sync avatar from Clerk on profile update
   const avatarUrl = await syncClerkAvatar(userId);
   const updateData = {
     ...parsed.data,
@@ -121,7 +119,7 @@ function mapUser(u: typeof usersTable.$inferSelect) {
     bio: u.bio,
     discordUsername: u.discordUsername,
     listingCount: u.listingCount,
-    createdAt: u.createdAt.toISOString(),
+    createdAt: u.createdAt,
   };
 }
 
@@ -142,8 +140,8 @@ function mapListing(l: typeof listingsTable.$inferSelect) {
     commentCount: l.commentCount,
     status: l.status,
     featured: l.featured,
-    createdAt: l.createdAt.toISOString(),
-    updatedAt: l.updatedAt.toISOString(),
+    createdAt: l.createdAt,
+    updatedAt: l.updatedAt,
   };
 }
 
