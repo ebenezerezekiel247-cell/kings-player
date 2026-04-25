@@ -4,20 +4,45 @@ import { useGetListings, useGetCategories, getGetListingsQueryKey } from "@works
 import { ListingCard } from "@/components/ListingCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Search, SlidersHorizontal, X, Gamepad2 } from "lucide-react";
+
+function getUrlParam(name: string): string {
+  if (typeof window === "undefined") return "";
+  return new URLSearchParams(window.location.search).get(name) ?? "";
+}
 
 export default function BrowsePage() {
-  const [location] = useLocation();
-  const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
+  const [, setLocation] = useLocation();
 
-  const [search, setSearch] = useState(params.get("search") ?? "");
-  const [category, setCategory] = useState(params.get("category") ?? "");
-  const [game, setGame] = useState(params.get("game") ?? "");
+  const [search, setSearch] = useState(() => getUrlParam("search"));
+  const [category, setCategory] = useState(() => getUrlParam("category"));
+  const [game, setGame] = useState(() => getUrlParam("game"));
   const [sort, setSort] = useState("newest");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+
+  // Update from URL whenever it changes (e.g. navbar search navigates here)
+  useEffect(() => {
+    const onPop = () => {
+      setSearch(getUrlParam("search"));
+      setCategory(getUrlParam("category"));
+      setGame(getUrlParam("game"));
+    };
+    window.addEventListener("popstate", onPop);
+    // Also read on mount in case of navigation
+    setSearch(getUrlParam("search"));
+    setCategory(getUrlParam("category"));
+    setGame(getUrlParam("game"));
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
 
   const queryParams = {
     search: search || undefined,
@@ -44,18 +69,21 @@ export default function BrowsePage() {
     setMaxPrice("");
   };
 
-  const hasFilters = search || category || game || minPrice || maxPrice || sort !== "newest";
+  const hasFilters =
+    search || category || game || minPrice || maxPrice || sort !== "newest";
 
   return (
     <div className="min-h-screen py-8 px-4">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold font-serif mb-2">Marketplace</h1>
-          <p className="text-muted-foreground">Find gaming accounts, items, currency, and more</p>
+          <p className="text-muted-foreground">
+            Find gaming accounts, items, currency, and more
+          </p>
         </div>
 
         {/* Search & Filter Bar */}
-        <div className="flex flex-col md:flex-row gap-3 mb-6">
+        <div className="flex flex-col md:flex-row gap-3 mb-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
@@ -85,11 +113,42 @@ export default function BrowsePage() {
           >
             <SlidersHorizontal className="w-4 h-4 mr-2" />
             Filters
-            {hasFilters && <span className="ml-1 w-2 h-2 rounded-full bg-primary" />}
+            {hasFilters && <span className="ml-1 w-2 h-2 rounded-full bg-primary inline-block" />}
           </Button>
         </div>
 
-        {/* Advanced Filters */}
+        {/* Active filter chips */}
+        {hasFilters && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {game && (
+              <span className="flex items-center gap-1.5 text-xs px-3 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary">
+                <Gamepad2 className="w-3 h-3" />
+                {game}
+                <button onClick={() => setGame("")}><X className="w-3 h-3" /></button>
+              </span>
+            )}
+            {category && (
+              <span className="flex items-center gap-1.5 text-xs px-3 py-1 rounded-full bg-card border border-card-border text-foreground">
+                {category}
+                <button onClick={() => setCategory("")}><X className="w-3 h-3" /></button>
+              </span>
+            )}
+            {search && (
+              <span className="flex items-center gap-1.5 text-xs px-3 py-1 rounded-full bg-card border border-card-border text-foreground">
+                "{search}"
+                <button onClick={() => setSearch("")}><X className="w-3 h-3" /></button>
+              </span>
+            )}
+            {(minPrice || maxPrice) && (
+              <span className="flex items-center gap-1.5 text-xs px-3 py-1 rounded-full bg-card border border-card-border text-foreground">
+                ${minPrice || "0"} – ${maxPrice || "∞"}
+                <button onClick={() => { setMinPrice(""); setMaxPrice(""); }}><X className="w-3 h-3" /></button>
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Advanced Filters Panel */}
         {showFilters && (
           <div className="mb-6 p-4 rounded-xl bg-card border border-card-border flex flex-wrap gap-4">
             <div className="flex-1 min-w-40">
@@ -101,7 +160,9 @@ export default function BrowsePage() {
                 <SelectContent>
                   <SelectItem value="">All Categories</SelectItem>
                   {categories?.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.slug}>{cat.name}</SelectItem>
+                    <SelectItem key={cat.id} value={cat.slug}>
+                      {cat.name}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -115,7 +176,9 @@ export default function BrowsePage() {
                 <SelectContent>
                   <SelectItem value="">All Games</SelectItem>
                   {games.map((g) => (
-                    <SelectItem key={g} value={g}>{g}</SelectItem>
+                    <SelectItem key={g} value={g}>
+                      {g}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -134,7 +197,7 @@ export default function BrowsePage() {
               <label className="text-xs text-muted-foreground mb-1 block">Max Price ($)</label>
               <Input
                 type="number"
-                placeholder="999"
+                placeholder="9999"
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(e.target.value)}
                 data-testid="input-max-price"
@@ -142,12 +205,40 @@ export default function BrowsePage() {
             </div>
             {hasFilters && (
               <div className="flex items-end">
-                <Button variant="ghost" size="sm" onClick={clearFilters} data-testid="button-clear-filters">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearFilters}
+                  data-testid="button-clear-filters"
+                >
                   <X className="w-4 h-4 mr-1" />
-                  Clear
+                  Clear All
                 </Button>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Quick game filter buttons (when no game selected) */}
+        {!game && !search && !isLoading && games.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-6">
+            {games.slice(0, 8).map((g) => (
+              <button
+                key={g}
+                onClick={() => setGame(g)}
+                className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-card border border-card-border hover:border-primary/40 hover:text-primary transition-colors"
+                data-testid={`button-quick-game-${g.toLowerCase().replace(/\s+/g, "-")}`}
+              >
+                <Gamepad2 className="w-3 h-3" />
+                {g}
+              </button>
+            ))}
+            <button
+              onClick={() => setLocation("/games")}
+              className="text-xs px-3 py-1.5 rounded-full text-muted-foreground hover:text-primary transition-colors"
+            >
+              View all games →
+            </button>
           </div>
         )}
 
@@ -160,7 +251,9 @@ export default function BrowsePage() {
           </div>
         ) : listings && listings.length > 0 ? (
           <>
-            <p className="text-sm text-muted-foreground mb-4">{listings.length} listing{listings.length !== 1 ? "s" : ""} found</p>
+            <p className="text-sm text-muted-foreground mb-4">
+              {listings.length} listing{listings.length !== 1 ? "s" : ""} found
+            </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
               {listings.map((listing) => (
                 <ListingCard key={listing.id} listing={listing} />
@@ -171,9 +264,13 @@ export default function BrowsePage() {
           <div className="text-center py-24">
             <Search className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">No listings found</h3>
-            <p className="text-muted-foreground text-sm">Try adjusting your filters or search terms</p>
+            <p className="text-muted-foreground text-sm">
+              Try adjusting your filters or search terms
+            </p>
             {hasFilters && (
-              <Button variant="outline" className="mt-4" onClick={clearFilters}>Clear Filters</Button>
+              <Button variant="outline" className="mt-4" onClick={clearFilters}>
+                Clear Filters
+              </Button>
             )}
           </div>
         )}

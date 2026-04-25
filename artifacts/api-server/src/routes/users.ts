@@ -4,6 +4,7 @@ import { db, usersTable, listingsTable } from "@workspace/db";
 import { GetUserProfileParams, UpdateMeBody } from "@workspace/api-zod";
 import { requireAuth } from "../middlewares/requireAuth";
 import { desc } from "drizzle-orm";
+import { clerkClient } from "@clerk/express";
 
 const router: IRouter = Router();
 
@@ -23,9 +24,33 @@ async function ensureUser(clerkId: string): Promise<typeof usersTable.$inferSele
   return newUser;
 }
 
+async function syncClerkAvatar(clerkId: string): Promise<string | null> {
+  try {
+    const clerkUser = await clerkClient.users.getUser(clerkId);
+    return clerkUser.imageUrl ?? null;
+  } catch {
+    return null;
+  }
+}
+
 router.get("/users/me", requireAuth, async (req, res): Promise<void> => {
   const userId = (req as any).userId as string;
   const user = await ensureUser(userId);
+
+  // Sync avatar URL from Clerk in the background if missing
+  if (!user.avatarUrl) {
+    const avatarUrl = await syncClerkAvatar(userId);
+    if (avatarUrl) {
+      const [updated] = await db
+        .update(usersTable)
+        .set({ avatarUrl })
+        .where(eq(usersTable.clerkId, userId))
+        .returning();
+      res.json(mapUser(updated));
+      return;
+    }
+  }
+
   res.json(mapUser(user));
 });
 
@@ -39,9 +64,16 @@ router.patch("/users/me", requireAuth, async (req, res): Promise<void> => {
   const userId = (req as any).userId as string;
   await ensureUser(userId);
 
+  // Also sync avatar from Clerk on profile update
+  const avatarUrl = await syncClerkAvatar(userId);
+  const updateData = {
+    ...parsed.data,
+    ...(avatarUrl ? { avatarUrl } : {}),
+  };
+
   const [updated] = await db
     .update(usersTable)
-    .set(parsed.data)
+    .set(updateData)
     .where(eq(usersTable.clerkId, userId))
     .returning();
 
