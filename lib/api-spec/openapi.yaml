@@ -3,13 +3,21 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Kings Player marketplace API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: listings
+    description: Marketplace listing operations
+  - name: comments
+    description: Comment operations
+  - name: users
+    description: User profile operations
+  - name: categories
+    description: Category operations
 paths:
   /healthz:
     get:
@@ -24,6 +32,323 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /listings:
+    get:
+      operationId: getListings
+      tags: [listings]
+      summary: List all listings
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: game
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: search
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: minPrice
+          in: query
+          schema:
+            type: ["number", "null"]
+        - name: maxPrice
+          in: query
+          schema:
+            type: ["number", "null"]
+        - name: sort
+          in: query
+          schema:
+            type: ["string", "null"]
+            enum: ["price_asc", "price_desc", "newest", "popular", null]
+      responses:
+        "200":
+          description: List of listings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Listing"
+
+    post:
+      operationId: createListing
+      tags: [listings]
+      summary: Create a new listing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateListingBody"
+      responses:
+        "201":
+          description: Listing created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Listing"
+        "401":
+          description: Unauthorized
+
+  /listings/{id}:
+    get:
+      operationId: getListing
+      tags: [listings]
+      summary: Get a listing by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Listing detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListingDetail"
+        "404":
+          description: Not found
+
+    patch:
+      operationId: updateListing
+      tags: [listings]
+      summary: Update a listing
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateListingBody"
+      responses:
+        "200":
+          description: Updated listing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Listing"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+
+    delete:
+      operationId: deleteListing
+      tags: [listings]
+      summary: Delete a listing
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+
+  /listings/{id}/comments:
+    get:
+      operationId: getListingComments
+      tags: [comments]
+      summary: Get comments for a listing
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Comment"
+
+    post:
+      operationId: createComment
+      tags: [comments]
+      summary: Post a comment on a listing
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCommentBody"
+      responses:
+        "201":
+          description: Comment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Comment"
+        "401":
+          description: Unauthorized
+
+  /comments/{id}:
+    delete:
+      operationId: deleteComment
+      tags: [comments]
+      summary: Delete a comment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+
+  /users/me:
+    get:
+      operationId: getMe
+      tags: [users]
+      summary: Get current user profile
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "401":
+          description: Unauthorized
+
+    patch:
+      operationId: updateMe
+      tags: [users]
+      summary: Update current user profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProfileBody"
+      responses:
+        "200":
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "401":
+          description: Unauthorized
+
+  /users/me/listings:
+    get:
+      operationId: getMyListings
+      tags: [users]
+      summary: Get listings for the current user
+      responses:
+        "200":
+          description: My listings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Listing"
+        "401":
+          description: Unauthorized
+
+  /users/{clerkId}:
+    get:
+      operationId: getUserProfile
+      tags: [users]
+      summary: Get a public user profile
+      parameters:
+        - name: clerkId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "404":
+          description: Not found
+
+  /categories:
+    get:
+      operationId: getCategories
+      tags: [categories]
+      summary: Get all categories
+      responses:
+        "200":
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+
+  /stats:
+    get:
+      operationId: getStats
+      tags: [listings]
+      summary: Get marketplace stats
+      responses:
+        "200":
+          description: Marketplace stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MarketplaceStats"
+
+  /listings/featured:
+    get:
+      operationId: getFeaturedListings
+      tags: [listings]
+      summary: Get featured/top listings
+      responses:
+        "200":
+          description: Featured listings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Listing"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +359,215 @@ components:
       required:
         - status
 
+    Listing:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        game:
+          type: string
+        category:
+          type: string
+        imageUrl:
+          type: ["string", "null"]
+        discordUsername:
+          type: string
+        sellerClerkId:
+          type: string
+        sellerUsername:
+          type: ["string", "null"]
+        sellerAvatarUrl:
+          type: ["string", "null"]
+        viewCount:
+          type: integer
+        commentCount:
+          type: integer
+        status:
+          type: string
+          enum: ["active", "sold", "inactive"]
+        featured:
+          type: boolean
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - title
+        - description
+        - price
+        - game
+        - category
+        - discordUsername
+        - sellerClerkId
+        - viewCount
+        - commentCount
+        - status
+        - featured
+        - createdAt
+        - updatedAt
+
+    ListingDetail:
+      allOf:
+        - $ref: "#/components/schemas/Listing"
+        - type: object
+          properties:
+            comments:
+              type: array
+              items:
+                $ref: "#/components/schemas/Comment"
+          required:
+            - comments
+
+    CreateListingBody:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        game:
+          type: string
+        category:
+          type: string
+        imageUrl:
+          type: ["string", "null"]
+        discordUsername:
+          type: string
+      required:
+        - title
+        - description
+        - price
+        - game
+        - category
+        - discordUsername
+
+    UpdateListingBody:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        game:
+          type: string
+        category:
+          type: string
+        imageUrl:
+          type: ["string", "null"]
+        discordUsername:
+          type: string
+        status:
+          type: string
+          enum: ["active", "sold", "inactive"]
+
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+        listingId:
+          type: integer
+        authorClerkId:
+          type: string
+        authorUsername:
+          type: ["string", "null"]
+        authorAvatarUrl:
+          type: ["string", "null"]
+        content:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - listingId
+        - authorClerkId
+        - content
+        - createdAt
+
+    CreateCommentBody:
+      type: object
+      properties:
+        content:
+          type: string
+      required:
+        - content
+
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        clerkId:
+          type: string
+        username:
+          type: ["string", "null"]
+        avatarUrl:
+          type: ["string", "null"]
+        bio:
+          type: ["string", "null"]
+        discordUsername:
+          type: ["string", "null"]
+        listingCount:
+          type: integer
+        createdAt:
+          type: string
+      required:
+        - id
+        - clerkId
+        - listingCount
+        - createdAt
+
+    UpdateProfileBody:
+      type: object
+      properties:
+        username:
+          type: string
+        bio:
+          type: string
+        discordUsername:
+          type: string
+
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        gameCount:
+          type: integer
+      required:
+        - id
+        - name
+        - slug
+        - gameCount
+
+    MarketplaceStats:
+      type: object
+      properties:
+        totalListings:
+          type: integer
+        activeListings:
+          type: integer
+        totalSellers:
+          type: integer
+        totalGames:
+          type: integer
+      required:
+        - totalListings
+        - activeListings
+        - totalSellers
+        - totalGames
