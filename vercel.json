@@ -1,0 +1,12 @@
+{
+  "buildCommand": "pnpm install && pnpm --filter @workspace/kings-player run build",
+  "outputDirectory": "artifacts/kings-player/dist/public",
+  "installCommand": "pnpm install",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://YOUR_RAILWAY_BACKEND_URL/api/$1"
+    }
+  ]
+}
