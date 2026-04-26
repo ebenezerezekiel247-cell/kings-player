@@ -20,7 +20,7 @@ const createSchema = z.object({
   game: z.string().min(1, "Game is required"),
   category: z.string().optional(),
   discordUsername: z.string().min(2, "Discord username is required"),
-  imageUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  imageUrl: z.string().optional(),
 });
 
 type CreateForm = z.infer<typeof createSchema>;
