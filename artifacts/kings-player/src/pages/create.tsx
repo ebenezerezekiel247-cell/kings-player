@@ -18,7 +18,7 @@ const createSchema = z.object({
   description: z.string().min(20, "Description must be at least 20 characters"),
   price: z.coerce.number().min(0.01, "Price must be greater than 0"),
   game: z.string().min(1, "Game is required"),
-  category: z.string().min(1, "Category is required"),
+  category: z.string().optional(),
   discordUsername: z.string().min(2, "Discord username is required"),
   imageUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
 });
@@ -90,7 +90,7 @@ export default function CreateListingPage() {
         description: data.description,
         price: data.price,
         game: data.game,
-        category: data.category,
+        category: data.category || undefined,
         discordUsername: data.discordUsername,
         imageUrl: data.imageUrl || null,
       },
@@ -173,11 +173,11 @@ export default function CreateListingPage() {
                   name="category"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Category</FormLabel>
+                      <FormLabel>Category <span className="text-muted-foreground font-normal">(optional)</span></FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger data-testid="select-category">
-                            <SelectValue placeholder="Select category" />
+                            <SelectValue placeholder="Select a category (optional)" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
