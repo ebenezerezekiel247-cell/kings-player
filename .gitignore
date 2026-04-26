@@ -44,6 +44,9 @@ Thumbs.db
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md
 
+# Frontend build output (Vercel reads from here)
+public/
+
 # Environment variables — never commit real secrets
 .env
 .env.local
