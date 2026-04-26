@@ -1,83 +1,60 @@
-# Deploying Kings Player to Vercel + Railway
+# Deploying Kings Player to Vercel
 
-Kings Player is a full-stack app. The **frontend** (React/Vite) goes to **Vercel** and the **backend** (Express API) goes to **Railway**. Both are free-tier friendly.
+Kings Player deploys entirely to **Vercel** — frontend and backend together. No separate server needed.
+
+The Express API runs as a Vercel Serverless Function (`api/index.ts`). The React frontend is built as a static site. Both live on the same Vercel domain.
 
 ---
 
-## Architecture
+## How it works
 
 ```
-User → Vercel (React frontend) → /api/* rewrites → Railway (Express API) → Turso DB
+User → Vercel
+  /api/* → Serverless Function (Express)  → Turso DB
+  /*     → Static frontend (React/Vite)
 ```
 
 ---
 
-## Step 1 — Deploy the Backend to Railway
+## Deploy in 3 steps
 
-1. Go to [railway.app](https://railway.app) and sign in with GitHub
-2. Click **New Project → Deploy from GitHub repo**
-3. Select your `kings-player` repository
-4. Railway will detect the repo — click **Configure** and set:
-   - **Root Directory**: `artifacts/api-server`
-   - **Build Command**: `cd ../.. && pnpm install && pnpm --filter @workspace/api-server run build`
-   - **Start Command**: `pnpm --filter @workspace/api-server run start`
-5. Under **Variables**, add all of these:
-
-| Variable | Value |
-|---|---|
-| `TURSO_URL` | `libsql://kings-player-yourname.aws-us-east-1.turso.io` |
-| `TURSO_TOKEN` | your Turso auth token |
-| `CLERK_SECRET_KEY` | `sk_live_...` from Clerk dashboard |
-| `CLERK_PUBLISHABLE_KEY` | `pk_live_...` from Clerk dashboard |
-| `SESSION_SECRET` | any long random string |
-| `NODE_ENV` | `production` |
-
-6. Click **Deploy** — Railway will give you a public URL like `https://kings-player-api.up.railway.app`
-7. **Copy this URL** — you need it for the next step
-
----
-
-## Step 2 — Update vercel.json with your Railway URL
-
-Open `vercel.json` at the project root and replace `YOUR_RAILWAY_BACKEND_URL`:
-
-```json
-{
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "https://kings-player-api.up.railway.app/api/$1"
-    }
-  ]
-}
-```
-
-Commit and push this change to GitHub before deploying to Vercel.
-
----
-
-## Step 3 — Deploy the Frontend to Vercel
+### Step 1 — Import the repo on Vercel
 
 1. Go to [vercel.com](https://vercel.com) and sign in with GitHub
 2. Click **Add New → Project**
-3. Import your `kings-player` GitHub repository
-4. Vercel will detect `vercel.json` — confirm these settings:
-   - **Framework Preset**: Other
-   - **Build Command**: `pnpm install && pnpm --filter @workspace/kings-player run build`
-   - **Output Directory**: `artifacts/kings-player/dist/public`
-   - **Install Command**: `pnpm install`
-5. Under **Environment Variables**, add:
-
-| Variable | Value |
-|---|---|
-| `VITE_CLERK_PUBLISHABLE_KEY` | `pk_live_...` from Clerk dashboard |
-| `VITE_API_URL` | *(leave empty — the vercel.json rewrite handles API routing)* |
-
-6. Click **Deploy**
+3. Import the `kings-player` repository
+4. Vercel reads `vercel.json` automatically — **do not change any build settings**
+5. Do **not** click Deploy yet — add env vars first (Step 2)
 
 ---
 
-## Step 4 — Update Clerk Allowed Origins
+### Step 2 — Add Environment Variables
+
+In the Vercel project settings under **Environment Variables**, add all of these:
+
+| Variable | Value | Where to get it |
+|---|---|---|
+| `TURSO_URL` | `libsql://kings-player-yourname.aws-us-east-1.turso.io` | [turso.tech](https://turso.tech) → your DB |
+| `TURSO_TOKEN` | your auth token (long JWT) | Turso dashboard → Generate Token |
+| `CLERK_SECRET_KEY` | `sk_live_...` | [clerk.com](https://dashboard.clerk.com) → API Keys |
+| `CLERK_PUBLISHABLE_KEY` | `pk_live_...` | Clerk dashboard → API Keys |
+| `VITE_CLERK_PUBLISHABLE_KEY` | same `pk_live_...` key | Same as above |
+| `SESSION_SECRET` | any random 32+ character string | Generate at [randomkeygen.com](https://randomkeygen.com) |
+| `NODE_ENV` | `production` | Set manually |
+
+---
+
+### Step 3 — Deploy
+
+Click **Deploy**. Vercel will:
+1. Install all pnpm workspace dependencies
+2. Build the React frontend (`artifacts/kings-player`)
+3. Bundle the Express API into a serverless function (`api/index.ts`)
+4. Deploy everything to `https://your-project.vercel.app`
+
+---
+
+### Step 4 — Update Clerk Allowed Origins
 
 1. Go to [dashboard.clerk.com](https://dashboard.clerk.com) → your app
 2. Under **Domains**, add your Vercel URL (e.g. `https://kings-player.vercel.app`)
@@ -88,35 +65,19 @@ Commit and push this change to GitHub before deploying to Vercel.
 
 ---
 
-## Environment Variables Summary
-
-### Railway (Backend)
-| Variable | Where to get it |
-|---|---|
-| `TURSO_URL` | Turso dashboard → your DB |
-| `TURSO_TOKEN` | Turso dashboard → Generate Token |
-| `CLERK_SECRET_KEY` | Clerk dashboard → API Keys |
-| `CLERK_PUBLISHABLE_KEY` | Clerk dashboard → API Keys |
-| `SESSION_SECRET` | Any random 32+ char string |
-| `NODE_ENV` | Set to `production` |
-
-### Vercel (Frontend)
-| Variable | Where to get it |
-|---|---|
-| `VITE_CLERK_PUBLISHABLE_KEY` | Clerk dashboard → API Keys (same `pk_live_...` key) |
-
----
-
 ## Troubleshooting
 
-**API calls return 404 on Vercel**
-→ Make sure `vercel.json` has the correct Railway URL in the rewrites block and you've pushed it to GitHub before deploying.
+**API routes return 404**
+→ Make sure `api/index.ts` exists in the repo root (it's auto-detected by Vercel).
+
+**`TURSO_URL` or `TURSO_TOKEN` errors in logs**
+→ Double-check the token — it's a long JWT string from Turso's "Generate Token" dialog.
 
 **Clerk sign-in redirects to wrong URL**
-→ Add your Vercel domain in the Clerk dashboard under Domains and Redirect URLs.
+→ Add your Vercel domain under Clerk → Domains and Redirect URLs.
 
-**Railway build fails**
-→ Make sure the Root Directory is set to `artifacts/api-server` and pnpm is available. Railway auto-detects pnpm from `pnpm-lock.yaml`.
+**Build fails: `Cannot find module`**
+→ Make sure `pnpm-lock.yaml` is committed to the repo (do not add it to `.gitignore`).
 
-**TURSO_URL or TURSO_TOKEN errors**
-→ Double-check you copied the full token from Turso — it's a long JWT string.
+**Function timeout**
+→ Turso uses HTTP connections so cold starts are fast. If you see timeouts, check your `TURSO_URL` is correct.
