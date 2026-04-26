@@ -2,6 +2,10 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
+import { fileURLToPath } from "url";
+
+// Compatible with Node.js 18+ (import.meta.dirname requires Node 21+)
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // PORT is only needed for dev/preview — not during `vite build`
 const rawPort = process.env.PORT;
@@ -25,7 +29,7 @@ export default defineConfig({
             ? [
                 await import("@replit/vite-plugin-cartographer").then((m) =>
                   m.cartographer({
-                    root: path.resolve(import.meta.dirname, ".."),
+                    root: path.resolve(__dirname, ".."),
                   }),
                 ),
                 await import("@replit/vite-plugin-dev-banner").then((m) =>
@@ -38,12 +42,12 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      "@": path.resolve(import.meta.dirname, "src"),
-      "@assets": path.resolve(import.meta.dirname, "..", "..", "attached_assets"),
+      "@": path.resolve(__dirname, "src"),
+      "@assets": path.resolve(__dirname, "..", "..", "attached_assets"),
     },
     dedupe: ["react", "react-dom"],
   },
-  root: path.resolve(import.meta.dirname),
+  root: path.resolve(__dirname),
   build: {
     outDir: "dist",
     emptyOutDir: true,
