@@ -1,5 +1,6 @@
 {
   "buildCommand": "pnpm install && pnpm --filter @workspace/kings-player run build",
+  "outputDirectory": "public",
   "installCommand": "pnpm install",
   "framework": null,
   "functions": {
