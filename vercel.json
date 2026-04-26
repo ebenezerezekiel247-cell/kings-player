@@ -1,6 +1,6 @@
 {
   "buildCommand": "pnpm install && pnpm --filter @workspace/kings-player run build",
-  "outputDirectory": "artifacts/kings-player/dist/public",
+  "outputDirectory": "artifacts/kings-player/dist",
   "installCommand": "pnpm install",
   "framework": null,
   "functions": {
