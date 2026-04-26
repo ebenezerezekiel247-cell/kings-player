@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useLocation } from "wouter";
+import { useRef, useState } from "react";
 import { useCreateListing, useGetCategories, getGetMyListingsQueryKey, getGetListingsQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Show } from "@clerk/react";
@@ -10,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Crown, Lock } from "lucide-react";
+import { ArrowLeft, Crown, Lock, ImagePlus, X } from "lucide-react";
 
 const createSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters").max(100),
@@ -31,10 +32,33 @@ const POPULAR_GAMES = [
   "Elder Scrolls Online", "New World", "Lost Ark", "Other"
 ];
 
+function resizeAndEncodeImage(file: File, maxPx = 1200): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, maxPx / Math.max(img.width, img.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", 0.82));
+      };
+      img.onerror = reject;
+      img.src = e.target!.result as string;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 export default function CreateListingPage() {
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
   const { data: categories } = useGetCategories();
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const createListing = useCreateListing({
     mutation: {
@@ -222,9 +246,54 @@ export default function CreateListingPage() {
                 name="imageUrl"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Image URL (optional)</FormLabel>
+                    <FormLabel>Photo (optional)</FormLabel>
                     <FormControl>
-                      <Input placeholder="https://..." {...field} data-testid="input-image-url" />
+                      <div className="space-y-3">
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          data-testid="input-image-file"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            const dataUrl = await resizeAndEncodeImage(file);
+                            setImagePreview(dataUrl);
+                            field.onChange(dataUrl);
+                          }}
+                        />
+                        {imagePreview ? (
+                          <div className="relative w-full rounded-xl overflow-hidden border border-border">
+                            <img
+                              src={imagePreview}
+                              alt="Preview"
+                              className="w-full max-h-56 object-cover"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setImagePreview(null);
+                                field.onChange("");
+                                if (fileInputRef.current) fileInputRef.current.value = "";
+                              }}
+                              className="absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white rounded-full p-1 transition-colors"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="w-full flex flex-col items-center gap-2 py-8 border-2 border-dashed border-border rounded-xl text-muted-foreground hover:border-primary/50 hover:text-foreground transition-colors cursor-pointer"
+                          >
+                            <ImagePlus className="w-7 h-7" />
+                            <span className="text-sm">Click to upload a photo</span>
+                            <span className="text-xs opacity-60">JPG, PNG, WEBP up to any size</span>
+                          </button>
+                        )}
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
