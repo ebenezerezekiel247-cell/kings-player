@@ -29,7 +29,14 @@ const POPULAR_GAMES = [
   "Valorant", "League of Legends", "World of Warcraft", "Diablo IV",
   "Fortnite", "CS2", "Apex Legends", "Dota 2", "Path of Exile",
   "Final Fantasy XIV", "Destiny 2", "Call of Duty", "Overwatch 2",
-  "Elder Scrolls Online", "New World", "Lost Ark", "Other"
+  "Elder Scrolls Online", "New World", "Lost Ark", "Genshin Impact",
+  "Honkai: Star Rail", "Roblox", "Minecraft", "Rust", "ARK: Survival Evolved",
+  "GTA V", "Red Dead Redemption 2", "FIFA 25", "NBA 2K25",
+  "Elden Ring", "Dark Souls III", "Monster Hunter: World",
+  "Black Desert Online", "Albion Online", "RuneScape", "Old School RuneScape",
+  "Throne and Liberty", "Lineage W", "MapleStory", "Ragnarok Online",
+  "Pokémon GO", "Clash of Clans", "Mobile Legends", "PUBG Mobile",
+  "Free Fire", "Brawl Stars", "Candy Crush", "Other"
 ];
 
 function resizeAndEncodeImage(file: File, maxPx = 1200): Promise<string> {
