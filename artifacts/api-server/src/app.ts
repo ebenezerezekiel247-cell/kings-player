@@ -1,3 +1,4 @@
+import "express-async-errors"; // must be first — patches Express 4 to catch async route errors
 import express, { type Express, type Request, type Response, type NextFunction } from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
@@ -36,11 +37,19 @@ app.use(clerkMiddleware());
 app.use("/api", router);
 
 // Global error handler — surfaces real error messages instead of empty 500s
+// express-async-errors ensures async route errors reach here instead of crashing Node
 app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
   const message = err instanceof Error ? err.message : String(err);
   const status = (err as any)?.status ?? (err as any)?.statusCode ?? 500;
   logger.error({ err }, "Unhandled error");
-  res.status(status).json({ error: message });
+  if (!res.headersSent) {
+    res.status(status).json({ error: message });
+  }
+});
+
+// Last-resort safety net so unhandled rejections don't silently crash the process
+process.on("unhandledRejection", (reason) => {
+  logger.error({ reason }, "Unhandled promise rejection");
 });
 
 export default app;
