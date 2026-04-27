@@ -1,5 +1,6 @@
+// Use the HTTP-only client — no native Rust binaries, works in all serverless runtimes
+import { createClient } from "@libsql/client/http";
 import { drizzle } from "drizzle-orm/libsql";
-import { createClient } from "@libsql/client";
 import * as schema from "./schema";
 
 function createDb() {
@@ -10,8 +11,11 @@ function createDb() {
     throw new Error("TURSO_TOKEN env var is not set");
   }
 
+  // @libsql/client/http requires https:// — convert libsql:// if needed
+  const url = process.env.TURSO_URL.replace(/^libsql:\/\//, "https://");
+
   const client = createClient({
-    url: process.env.TURSO_URL,
+    url,
     authToken: process.env.TURSO_TOKEN,
   });
 
@@ -19,8 +23,6 @@ function createDb() {
 }
 
 // Lazy singleton — initialized on first use, not at module load time.
-// This prevents the Vercel function from crashing at startup if env vars
-// are read before the runtime environment injects them.
 let _db: ReturnType<typeof createDb> | null = null;
 
 export const db = new Proxy({} as ReturnType<typeof createDb>, {
