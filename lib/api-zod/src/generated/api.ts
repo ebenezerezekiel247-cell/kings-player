@@ -64,7 +64,7 @@ export const CreateListingBody = zod.object({
   description: zod.string(),
   price: zod.number(),
   game: zod.string(),
-  category: zod.string(),
+  category: zod.string().optional(),
   imageUrl: zod.string().nullish(),
   discordUsername: zod.string(),
 });
