@@ -4,7 +4,7 @@
   "installCommand": "pnpm install",
   "framework": null,
   "functions": {
-    "api/index.ts": {
+    "api/[...path].ts": {
       "maxDuration": 30,
       "memory": 512
     }
