@@ -322,9 +322,12 @@ export default function CreateListingPage() {
               />
 
               {createListing.isError && (
-                <p className="text-sm text-destructive text-center">
-                  Failed to create listing. Please check all fields and try again.
-                </p>
+                <div className="text-sm text-destructive text-center space-y-1">
+                  <p className="font-medium">Failed to create listing</p>
+                  <p className="text-xs opacity-75 font-mono break-all">
+                    {(createListing.error as any)?.message || String(createListing.error)}
+                  </p>
+                </div>
               )}
 
               <Button
