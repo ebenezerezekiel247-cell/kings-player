@@ -33,13 +33,10 @@ router.get("/listings", async (req, res): Promise<void> => {
     return;
   }
 
-  const { category, game, search, minPrice, maxPrice, sort } = parsed.data;
+  const { game, search, minPrice, maxPrice, sort } = parsed.data;
 
   const conditions = [eq(listingsTable.status, "active")];
 
-  if (category) {
-    conditions.push(eq(listingsTable.category, category));
-  }
   if (game) {
     conditions.push(eq(listingsTable.game, game));
   }
@@ -228,7 +225,6 @@ function mapListing(l: typeof listingsTable.$inferSelect) {
     description: l.description,
     price: Number(l.price),
     game: l.game,
-    category: l.category,
     imageUrl: l.imageUrl,
     discordUsername: l.discordUsername,
     sellerClerkId: l.sellerClerkId,

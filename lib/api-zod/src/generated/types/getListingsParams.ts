@@ -11,10 +11,6 @@ export type GetListingsParams = {
   /**
    * @nullable
    */
-  category?: string | null;
-  /**
-   * @nullable
-   */
   game?: string | null;
   /**
    * @nullable

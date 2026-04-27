@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { useGetListings, useGetCategories, getGetListingsQueryKey } from "@workspace/api-client-react";
+import { useGetListings, getGetListingsQueryKey } from "@workspace/api-client-react";
 import { ListingCard } from "@/components/ListingCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,6 @@ export default function BrowsePage() {
   const [, setLocation] = useLocation();
 
   const [search, setSearch] = useState(() => getUrlParam("search"));
-  const [category, setCategory] = useState(() => getUrlParam("category"));
   const [game, setGame] = useState(() => getUrlParam("game"));
   const [sort, setSort] = useState("newest");
   const [minPrice, setMinPrice] = useState("");
@@ -33,20 +32,17 @@ export default function BrowsePage() {
   useEffect(() => {
     const onPop = () => {
       setSearch(getUrlParam("search"));
-      setCategory(getUrlParam("category"));
       setGame(getUrlParam("game"));
     };
     window.addEventListener("popstate", onPop);
     // Also read on mount in case of navigation
     setSearch(getUrlParam("search"));
-    setCategory(getUrlParam("category"));
     setGame(getUrlParam("game"));
     return () => window.removeEventListener("popstate", onPop);
   }, []);
 
   const queryParams = {
     search: search || undefined,
-    category: category || undefined,
     game: game || undefined,
     sort: (sort as "newest" | "price_asc" | "price_desc" | "popular") || undefined,
     minPrice: minPrice ? Number(minPrice) : undefined,
@@ -56,13 +52,11 @@ export default function BrowsePage() {
   const { data: listings, isLoading } = useGetListings(queryParams, {
     query: { queryKey: getGetListingsQueryKey(queryParams) },
   });
-  const { data: categories } = useGetCategories();
 
   const games = listings ? [...new Set(listings.map((l) => l.game))].sort() : [];
 
   const clearFilters = () => {
     setSearch("");
-    setCategory("");
     setGame("");
     setSort("newest");
     setMinPrice("");
@@ -70,7 +64,7 @@ export default function BrowsePage() {
   };
 
   const hasFilters =
-    search || category || game || minPrice || maxPrice || sort !== "newest";
+    search || game || minPrice || maxPrice || sort !== "newest";
 
   return (
     <div className="min-h-screen py-8 px-4">
@@ -127,12 +121,6 @@ export default function BrowsePage() {
                 <button onClick={() => setGame("")}><X className="w-3 h-3" /></button>
               </span>
             )}
-            {category && (
-              <span className="flex items-center gap-1.5 text-xs px-3 py-1 rounded-full bg-card border border-card-border text-foreground">
-                {category}
-                <button onClick={() => setCategory("")}><X className="w-3 h-3" /></button>
-              </span>
-            )}
             {search && (
               <span className="flex items-center gap-1.5 text-xs px-3 py-1 rounded-full bg-card border border-card-border text-foreground">
                 "{search}"
@@ -151,22 +139,6 @@ export default function BrowsePage() {
         {/* Advanced Filters Panel */}
         {showFilters && (
           <div className="mb-6 p-4 rounded-xl bg-card border border-card-border flex flex-wrap gap-4">
-            <div className="flex-1 min-w-40">
-              <label className="text-xs text-muted-foreground mb-1 block">Category</label>
-              <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger data-testid="select-category">
-                  <SelectValue placeholder="All Categories" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
-                  {categories?.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.slug}>
-                      {cat.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
             <div className="flex-1 min-w-40">
               <label className="text-xs text-muted-foreground mb-1 block">Game</label>
               <Select value={game} onValueChange={setGame}>

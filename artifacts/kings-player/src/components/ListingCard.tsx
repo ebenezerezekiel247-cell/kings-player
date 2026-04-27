@@ -8,7 +8,6 @@ interface Listing {
   description: string;
   price: number;
   game: string;
-  category: string;
   imageUrl?: string | null;
   sellerUsername?: string | null;
   sellerAvatarUrl?: string | null;
@@ -23,17 +22,6 @@ interface ListingCardProps {
 }
 
 export function ListingCard({ listing }: ListingCardProps) {
-  const categoryColors: Record<string, string> = {
-    accounts: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-    items: "bg-purple-500/20 text-purple-400 border-purple-500/30",
-    currency: "bg-green-500/20 text-green-400 border-green-500/30",
-    boosting: "bg-red-500/20 text-red-400 border-red-500/30",
-    "power-leveling": "bg-orange-500/20 text-orange-400 border-orange-500/30",
-    coaching: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
-  };
-  const catSlug = listing.category.toLowerCase().replace(/\s+/g, "-");
-  const catClass = categoryColors[catSlug] || "bg-muted text-muted-foreground border-border";
-
   return (
     <Link href={`/listing/${listing.id}`} data-testid={`card-listing-${listing.id}`}>
       <div className="group relative bg-card border border-card-border rounded-xl overflow-hidden hover:border-primary/40 transition-all duration-200 hover:shadow-lg hover:shadow-primary/5 cursor-pointer h-full flex flex-col">
@@ -57,7 +45,6 @@ export function ListingCard({ listing }: ListingCardProps) {
 
         <div className="p-4 flex flex-col flex-1 gap-2">
           <div className="flex items-start justify-between gap-2">
-            <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${catClass}`}>{listing.category}</span>
             <span className="text-xs text-muted-foreground truncate">{listing.game}</span>
           </div>
 

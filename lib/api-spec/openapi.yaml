@@ -39,10 +39,6 @@ paths:
       tags: [listings]
       summary: List all listings
       parameters:
-        - name: category
-          in: query
-          schema:
-            type: ["string", "null"]
         - name: game
           in: query
           schema:
@@ -372,8 +368,6 @@ components:
           type: number
         game:
           type: string
-        category:
-          type: string
         imageUrl:
           type: ["string", "null"]
         discordUsername:
@@ -403,7 +397,6 @@ components:
         - description
         - price
         - game
-        - category
         - discordUsername
         - sellerClerkId
         - viewCount
@@ -436,8 +429,6 @@ components:
           type: number
         game:
           type: string
-        category:
-          type: string
         imageUrl:
           type: ["string", "null"]
         discordUsername:
@@ -459,8 +450,6 @@ components:
         price:
           type: number
         game:
-          type: string
-        category:
           type: string
         imageUrl:
           type: ["string", "null"]

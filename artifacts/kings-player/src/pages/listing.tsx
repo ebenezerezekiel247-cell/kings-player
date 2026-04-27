@@ -118,7 +118,6 @@ export default function ListingPage() {
           {/* Title & info */}
           <div>
             <div className="flex items-center gap-3 mb-3 flex-wrap">
-              <Badge variant="outline" className="text-xs">{listing.category}</Badge>
               <Badge variant="secondary" className="text-xs">{listing.game}</Badge>
               {listing.featured && (
                 <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20">
