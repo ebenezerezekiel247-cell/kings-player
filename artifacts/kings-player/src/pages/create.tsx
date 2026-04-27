@@ -151,53 +151,57 @@ export default function CreateListingPage() {
                 )}
               />
 
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="game"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Game</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger data-testid="select-game">
-                            <SelectValue placeholder="Select game" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {POPULAR_GAMES.map((g) => (
-                            <SelectItem key={g} value={g}>{g}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <FormField
+                control={form.control}
+                name="game"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Game</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger data-testid="select-game">
+                          <SelectValue placeholder="Select game" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {POPULAR_GAMES.map((g) => (
+                          <SelectItem key={g} value={g}>{g}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                <FormField
-                  control={form.control}
-                  name="category"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Category <span className="text-muted-foreground font-normal">(optional)</span></FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger data-testid="select-category">
-                            <SelectValue placeholder="Select a category (optional)" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {categories?.map((cat) => (
-                            <SelectItem key={cat.id} value={cat.slug}>{cat.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Category <span className="text-muted-foreground font-normal">(optional)</span></FormLabel>
+                    <FormControl>
+                      <div className="flex flex-wrap gap-2" data-testid="select-category">
+                        {categories?.map((cat) => (
+                          <button
+                            key={cat.id}
+                            type="button"
+                            onClick={() => field.onChange(field.value === cat.slug ? "" : cat.slug)}
+                            className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-all ${
+                              field.value === cat.slug
+                                ? "bg-primary text-primary-foreground border-primary"
+                                : "bg-card border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                            }`}
+                          >
+                            {cat.name}
+                          </button>
+                        ))}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <FormField
                 control={form.control}
@@ -306,6 +310,12 @@ export default function CreateListingPage() {
                   </FormItem>
                 )}
               />
+
+              {createListing.isError && (
+                <p className="text-sm text-destructive text-center">
+                  Failed to create listing. Please check all fields and try again.
+                </p>
+              )}
 
               <Button
                 type="submit"

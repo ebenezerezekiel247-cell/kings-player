@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClientProvider, useQueryClient } from "@tanstack/react-query";
-import { ClerkProvider, SignIn, SignUp, useClerk, useUser } from "@clerk/react";
+import { ClerkProvider, SignIn, SignUp, useAuth, useClerk, useUser } from "@clerk/react";
 import { dark } from "@clerk/themes";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,7 +15,7 @@ import ListingPage from "@/pages/listing";
 import CreateListingPage from "@/pages/create";
 import DashboardPage from "@/pages/dashboard";
 import ProfilePage from "@/pages/profile";
-import { getMe, updateMe } from "@workspace/api-client-react";
+import { getMe, updateMe, setAuthTokenGetter } from "@workspace/api-client-react";
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
@@ -97,6 +97,16 @@ function SignUpPage() {
   );
 }
 
+/** Keeps the API client auth token in sync with the Clerk session */
+function ClerkTokenSync() {
+  const { getToken } = useAuth();
+  useEffect(() => {
+    setAuthTokenGetter(() => getToken());
+    return () => setAuthTokenGetter(null);
+  }, [getToken]);
+  return null;
+}
+
 /** Syncs the signed-in Clerk user into our DB when they first log in */
 function UserSync() {
   const { isSignedIn, user } = useUser();
@@ -157,6 +167,7 @@ function AppRoutes() {
       routerReplace={(to) => setLocation(stripBase(to), { replace: true })}
     >
       <QueryClientProvider client={queryClient}>
+        <ClerkTokenSync />
         <UserSync />
         <ClerkCacheInvalidator />
         <TooltipProvider>
