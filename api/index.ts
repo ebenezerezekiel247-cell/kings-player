@@ -10,4 +10,12 @@
  */
 import app from "../artifacts/api-server/src/app";
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "10mb",
+    },
+  },
+};
+
 export default app;
