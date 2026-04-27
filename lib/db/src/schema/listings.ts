@@ -8,6 +8,7 @@ export const listingsTable = sqliteTable("listings", {
   description: text("description").notNull(),
   price: real("price").notNull(),
   game: text("game").notNull(),
+  category: text("category"),
   imageUrl: text("image_url"),
   discordUsername: text("discord_username").notNull(),
   sellerClerkId: text("seller_clerk_id").notNull(),

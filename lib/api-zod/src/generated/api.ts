@@ -19,6 +19,7 @@ export const HealthCheckResponse = zod.object({
  * @summary List all listings
  */
 export const GetListingsQueryParams = zod.object({
+  category: zod.coerce.string().nullish(),
   game: zod.coerce.string().nullish(),
   search: zod.coerce.string().nullish(),
   minPrice: zod.coerce.number().nullish(),
@@ -40,6 +41,7 @@ export const GetListingsResponseItem = zod.object({
   description: zod.string(),
   price: zod.number(),
   game: zod.string(),
+  category: zod.string(),
   imageUrl: zod.string().nullish(),
   discordUsername: zod.string(),
   sellerClerkId: zod.string(),
@@ -62,6 +64,7 @@ export const CreateListingBody = zod.object({
   description: zod.string(),
   price: zod.number(),
   game: zod.string(),
+  category: zod.string().optional(),
   imageUrl: zod.string().nullish(),
   discordUsername: zod.string(),
 });
@@ -80,6 +83,7 @@ export const GetListingResponse = zod
     description: zod.string(),
     price: zod.number(),
     game: zod.string(),
+    category: zod.string(),
     imageUrl: zod.string().nullish(),
     discordUsername: zod.string(),
     sellerClerkId: zod.string(),
@@ -120,6 +124,7 @@ export const UpdateListingBody = zod.object({
   description: zod.string().optional(),
   price: zod.number().optional(),
   game: zod.string().optional(),
+  category: zod.string().optional(),
   imageUrl: zod.string().nullish(),
   discordUsername: zod.string().optional(),
   status: zod.enum(["active", "sold", "inactive"]).optional(),
@@ -131,6 +136,7 @@ export const UpdateListingResponse = zod.object({
   description: zod.string(),
   price: zod.number(),
   game: zod.string(),
+  category: zod.string(),
   imageUrl: zod.string().nullish(),
   discordUsername: zod.string(),
   sellerClerkId: zod.string(),

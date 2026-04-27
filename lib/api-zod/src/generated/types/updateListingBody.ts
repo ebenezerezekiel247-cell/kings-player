@@ -12,6 +12,7 @@ export interface UpdateListingBody {
   description?: string;
   price?: number;
   game?: string;
+  category?: string;
   /** @nullable */
   imageUrl?: string | null;
   discordUsername?: string;

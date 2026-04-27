@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useLocation } from "wouter";
 import { useRef, useState } from "react";
-import { useCreateListing, getGetMyListingsQueryKey, getGetListingsQueryKey } from "@workspace/api-client-react";
+import { useCreateListing, useGetCategories, getGetMyListingsQueryKey, getGetListingsQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Show } from "@clerk/react";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -18,6 +18,7 @@ const createSchema = z.object({
   description: z.string().min(20, "Description must be at least 20 characters"),
   price: z.coerce.number().min(0.01, "Price must be greater than 0"),
   game: z.string().min(1, "Game is required"),
+  category: z.string().optional(),
   discordUsername: z.string().min(2, "Discord username is required"),
   imageUrl: z.string().optional(),
 });
@@ -55,6 +56,7 @@ function resizeAndEncodeImage(file: File, maxPx = 1200): Promise<string> {
 export default function CreateListingPage() {
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
+  const { data: categories } = useGetCategories();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -75,6 +77,7 @@ export default function CreateListingPage() {
       description: "",
       price: 0,
       game: "",
+      category: "",
       discordUsername: "",
       imageUrl: "",
     },
@@ -87,6 +90,7 @@ export default function CreateListingPage() {
         description: data.description,
         price: data.price,
         game: data.game,
+        category: data.category || undefined,
         discordUsername: data.discordUsername,
         imageUrl: data.imageUrl || null,
       },
@@ -164,6 +168,28 @@ export default function CreateListingPage() {
                   )}
                 />
 
+                <FormField
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Category <span className="text-muted-foreground font-normal">(optional)</span></FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger data-testid="select-category">
+                            <SelectValue placeholder="Select a category (optional)" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {categories?.map((cat) => (
+                            <SelectItem key={cat.id} value={cat.slug}>{cat.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
 
               <FormField

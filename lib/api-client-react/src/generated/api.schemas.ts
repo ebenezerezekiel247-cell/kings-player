@@ -23,6 +23,7 @@ export interface Listing {
   description: string;
   price: number;
   game: string;
+  category: string;
   /** @nullable */
   imageUrl?: string | null;
   discordUsername: string;
@@ -60,6 +61,7 @@ export interface CreateListingBody {
   description: string;
   price: number;
   game: string;
+  category: string;
   /** @nullable */
   imageUrl?: string | null;
   discordUsername: string;
@@ -79,6 +81,7 @@ export interface UpdateListingBody {
   description?: string;
   price?: number;
   game?: string;
+  category?: string;
   /** @nullable */
   imageUrl?: string | null;
   discordUsername?: string;
@@ -125,6 +128,10 @@ export interface MarketplaceStats {
 }
 
 export type GetListingsParams = {
+  /**
+   * @nullable
+   */
+  category?: string | null;
   /**
    * @nullable
    */
