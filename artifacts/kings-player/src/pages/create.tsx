@@ -25,6 +25,16 @@ const createSchema = z.object({
 
 type CreateForm = z.infer<typeof createSchema>;
 
+const FALLBACK_CATEGORIES = [
+  { id: 1, slug: "accounts", name: "Accounts" },
+  { id: 2, slug: "items", name: "Items" },
+  { id: 3, slug: "currency", name: "Currency" },
+  { id: 4, slug: "boosting", name: "Boosting" },
+  { id: 5, slug: "power-leveling", name: "Power Leveling" },
+  { id: 6, slug: "coaching", name: "Coaching" },
+  { id: 7, slug: "game-coins", name: "Game Coins" },
+];
+
 const POPULAR_GAMES = [
   "Valorant", "League of Legends", "World of Warcraft", "Diablo IV",
   "Fortnite", "CS2", "Apex Legends", "Dota 2", "Path of Exile",
@@ -182,7 +192,7 @@ export default function CreateListingPage() {
                     <FormLabel>Category <span className="text-muted-foreground font-normal">(optional)</span></FormLabel>
                     <FormControl>
                       <div className="flex flex-wrap gap-2" data-testid="select-category">
-                        {categories?.map((cat) => (
+                        {(categories ?? FALLBACK_CATEGORIES).map((cat) => (
                           <button
                             key={cat.id}
                             type="button"
