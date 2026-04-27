@@ -1,6 +1,8 @@
 // Use the HTTP-only client — no native Rust binaries, works in all serverless runtimes
 import { createClient } from "@libsql/client/http";
-import { drizzle } from "drizzle-orm/libsql";
+// Use the HTTP-specific drizzle adapter to avoid pulling in drizzle-orm/libsql
+// main entry which imports @libsql/client (full node.js) → sqlite3.js → libsql native binary.
+import { drizzle } from "drizzle-orm/libsql/http";
 import * as schema from "./schema";
 
 function createDb() {
