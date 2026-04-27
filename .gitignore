@@ -56,5 +56,3 @@ public/
 .cache/
 .local/
 
-# Generated Vercel function bundle
-api/index.js
