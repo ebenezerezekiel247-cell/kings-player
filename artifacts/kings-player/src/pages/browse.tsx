@@ -219,36 +219,6 @@ export default function BrowsePage() {
           </div>
         )}
 
-        {/* Category quick-filter pills — always visible */}
-        {categories && categories.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-4">
-            <button
-              onClick={() => setCategory("")}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
-                !category
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-card border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
-              }`}
-            >
-              All
-            </button>
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setCategory(category === cat.slug ? "" : cat.slug)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
-                  category === cat.slug
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-card border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
-                }`}
-                data-testid={`button-category-${cat.slug}`}
-              >
-                {cat.name}
-              </button>
-            ))}
-          </div>
-        )}
-
         {/* Quick game filter buttons (when no game selected) */}
         {!game && !search && !isLoading && games.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-6">

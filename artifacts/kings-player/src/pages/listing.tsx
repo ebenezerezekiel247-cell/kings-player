@@ -5,6 +5,7 @@ import {
   useGetListingComments,
   useCreateComment,
   useDeleteComment,
+  useGetCategories,
   getGetListingQueryKey,
   getGetListingCommentsQueryKey,
 } from "@workspace/api-client-react";
@@ -32,6 +33,7 @@ export default function ListingPage() {
   const { data: comments, isLoading: commentsLoading } = useGetListingComments(id, {
     query: { enabled: !!id, queryKey: getGetListingCommentsQueryKey(id) },
   });
+  const { data: categories } = useGetCategories();
 
   const createComment = useCreateComment({
     mutation: {
@@ -270,6 +272,25 @@ export default function ListingPage() {
                   <div className="font-medium text-sm">{listing.sellerUsername}</div>
                   <div className="text-xs text-muted-foreground">View profile</div>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* Browse by Category */}
+          {categories && categories.length > 0 && (
+            <div className="p-5 rounded-xl bg-card border border-card-border">
+              <h3 className="font-semibold text-sm mb-3">Browse by Category</h3>
+              <div className="flex flex-wrap gap-2">
+                {categories.map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => setLocation(`/browse?category=${cat.slug}`)}
+                    className="px-3 py-1 rounded-full text-xs font-medium bg-muted hover:bg-primary hover:text-primary-foreground transition-colors border border-card-border"
+                    data-testid={`pill-category-${cat.slug}`}
+                  >
+                    {cat.name}
+                  </button>
+                ))}
               </div>
             </div>
           )}
