@@ -12,9 +12,7 @@ import app from "../artifacts/api-server/src/app";
 
 export const config = {
   api: {
-    bodyParser: {
-      sizeLimit: "10mb",
-    },
+    bodyParser: false, // Express handles its own body parsing
   },
 };
 
