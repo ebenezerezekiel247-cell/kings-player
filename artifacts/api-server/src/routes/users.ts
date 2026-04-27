@@ -1,10 +1,10 @@
 import { Router, type IRouter } from "express";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { db, usersTable, listingsTable } from "@workspace/db";
 import { GetUserProfileParams, UpdateMeBody } from "@workspace/api-zod";
 import { requireAuth } from "../middlewares/requireAuth";
-import { desc } from "drizzle-orm";
 import { clerkClient } from "@clerk/express";
+import { asyncHandler } from "../utils/asyncHandler";
 
 const router: IRouter = Router();
 
@@ -33,7 +33,7 @@ async function syncClerkAvatar(clerkId: string): Promise<string | null> {
   }
 }
 
-router.get("/users/me", requireAuth, async (req, res): Promise<void> => {
+router.get("/users/me", requireAuth, asyncHandler(async (req, res) => {
   const userId = (req as any).userId as string;
   const user = await ensureUser(userId);
 
@@ -51,9 +51,9 @@ router.get("/users/me", requireAuth, async (req, res): Promise<void> => {
   }
 
   res.json(mapUser(user));
-});
+}));
 
-router.patch("/users/me", requireAuth, async (req, res): Promise<void> => {
+router.patch("/users/me", requireAuth, asyncHandler(async (req, res) => {
   const parsed = UpdateMeBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -76,9 +76,9 @@ router.patch("/users/me", requireAuth, async (req, res): Promise<void> => {
     .returning();
 
   res.json(mapUser(updated));
-});
+}));
 
-router.get("/users/me/listings", requireAuth, async (req, res): Promise<void> => {
+router.get("/users/me/listings", requireAuth, asyncHandler(async (req, res) => {
   const userId = (req as any).userId as string;
 
   const listings = await db
@@ -88,9 +88,9 @@ router.get("/users/me/listings", requireAuth, async (req, res): Promise<void> =>
     .orderBy(desc(listingsTable.createdAt));
 
   res.json(listings.map(mapListing));
-});
+}));
 
-router.get("/users/:clerkId", async (req, res): Promise<void> => {
+router.get("/users/:clerkId", asyncHandler(async (req, res) => {
   const params = GetUserProfileParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -108,7 +108,7 @@ router.get("/users/:clerkId", async (req, res): Promise<void> => {
   }
 
   res.json(mapUser(user));
-});
+}));
 
 function mapUser(u: typeof usersTable.$inferSelect) {
   return {

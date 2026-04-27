@@ -10,11 +10,11 @@ import {
   DeleteListingParams,
 } from "@workspace/api-zod";
 import { requireAuth } from "../middlewares/requireAuth";
-import { getAuth } from "@clerk/express";
+import { asyncHandler } from "../utils/asyncHandler";
 
 const router: IRouter = Router();
 
-router.get("/listings/featured", async (_req, res): Promise<void> => {
+router.get("/listings/featured", asyncHandler(async (_req, res) => {
   const listings = await db
     .select()
     .from(listingsTable)
@@ -22,11 +22,10 @@ router.get("/listings/featured", async (_req, res): Promise<void> => {
     .orderBy(desc(listingsTable.createdAt))
     .limit(8);
 
-  const mapped = listings.map(mapListing);
-  res.json(mapped);
-});
+  res.json(listings.map(mapListing));
+}));
 
-router.get("/listings", async (req, res): Promise<void> => {
+router.get("/listings", asyncHandler(async (req, res) => {
   const parsed = GetListingsQueryParams.safeParse(req.query);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -37,43 +36,27 @@ router.get("/listings", async (req, res): Promise<void> => {
 
   const conditions = [eq(listingsTable.status, "active")];
 
-  if (category) {
-    conditions.push(eq(listingsTable.category, category));
-  }
-  if (game) {
-    conditions.push(eq(listingsTable.game, game));
-  }
+  if (category) conditions.push(eq(listingsTable.category, category));
+  if (game) conditions.push(eq(listingsTable.game, game));
   if (search) {
     const term = `%${search}%`;
     conditions.push(
       or(
         like(sql`lower(${listingsTable.title})`, term.toLowerCase()),
         like(sql`lower(${listingsTable.description})`, term.toLowerCase()),
-        like(sql`lower(${listingsTable.game})`, term.toLowerCase())
-      )!
+        like(sql`lower(${listingsTable.game})`, term.toLowerCase()),
+      )!,
     );
   }
-  if (minPrice != null) {
-    conditions.push(gte(listingsTable.price, minPrice));
-  }
-  if (maxPrice != null) {
-    conditions.push(lte(listingsTable.price, maxPrice));
-  }
+  if (minPrice != null) conditions.push(gte(listingsTable.price, minPrice));
+  if (maxPrice != null) conditions.push(lte(listingsTable.price, maxPrice));
 
   let orderBy;
   switch (sort) {
-    case "price_asc":
-      orderBy = asc(listingsTable.price);
-      break;
-    case "price_desc":
-      orderBy = desc(listingsTable.price);
-      break;
-    case "popular":
-      orderBy = desc(listingsTable.viewCount);
-      break;
-    case "newest":
-    default:
-      orderBy = desc(listingsTable.createdAt);
+    case "price_asc": orderBy = asc(listingsTable.price); break;
+    case "price_desc": orderBy = desc(listingsTable.price); break;
+    case "popular": orderBy = desc(listingsTable.viewCount); break;
+    default: orderBy = desc(listingsTable.createdAt);
   }
 
   const listings = await db
@@ -83,9 +66,9 @@ router.get("/listings", async (req, res): Promise<void> => {
     .orderBy(orderBy);
 
   res.json(listings.map(mapListing));
-});
+}));
 
-router.post("/listings", requireAuth, async (req, res): Promise<void> => {
+router.post("/listings", requireAuth, asyncHandler(async (req, res) => {
   const parsed = CreateListingBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -116,9 +99,9 @@ router.post("/listings", requireAuth, async (req, res): Promise<void> => {
   }
 
   res.status(201).json(mapListing(listing));
-});
+}));
 
-router.get("/listings/:id", async (req, res): Promise<void> => {
+router.get("/listings/:id", asyncHandler(async (req, res) => {
   const params = GetListingParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -141,9 +124,9 @@ router.get("/listings/:id", async (req, res): Promise<void> => {
     .where(eq(listingsTable.id, params.data.id));
 
   res.json({ ...mapListing(listing), comments: [] });
-});
+}));
 
-router.patch("/listings/:id", requireAuth, async (req, res): Promise<void> => {
+router.patch("/listings/:id", requireAuth, asyncHandler(async (req, res) => {
   const params = UpdateListingParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -174,9 +157,7 @@ router.patch("/listings/:id", requireAuth, async (req, res): Promise<void> => {
   }
 
   const updateData: Record<string, unknown> = { ...parsed.data };
-  if (parsed.data.price != null) {
-    updateData.price = Number(parsed.data.price);
-  }
+  if (parsed.data.price != null) updateData.price = Number(parsed.data.price);
 
   const [updated] = await db
     .update(listingsTable)
@@ -185,9 +166,9 @@ router.patch("/listings/:id", requireAuth, async (req, res): Promise<void> => {
     .returning();
 
   res.json(mapListing(updated));
-});
+}));
 
-router.delete("/listings/:id", requireAuth, async (req, res): Promise<void> => {
+router.delete("/listings/:id", requireAuth, asyncHandler(async (req, res) => {
   const params = DeleteListingParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -219,7 +200,7 @@ router.delete("/listings/:id", requireAuth, async (req, res): Promise<void> => {
     .where(eq(usersTable.clerkId, userId));
 
   res.sendStatus(204);
-});
+}));
 
 function mapListing(l: typeof listingsTable.$inferSelect) {
   return {

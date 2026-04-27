@@ -4,8 +4,7 @@
   "installCommand": "pnpm install",
   "framework": null,
   "routes": [
-    { "src": "/api/ping", "dest": "/api/ping" },
-    { "src": "/api/(.*)", "dest": "/api/[...path]" },
+    { "src": "/api/(.*)", "dest": "/api/index" },
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]

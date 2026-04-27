@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { eq, asc } from "drizzle-orm";
+import { eq, asc, sql } from "drizzle-orm";
 import { db, commentsTable, listingsTable, usersTable } from "@workspace/db";
 import {
   GetListingCommentsParams,
@@ -8,11 +8,11 @@ import {
   DeleteCommentParams,
 } from "@workspace/api-zod";
 import { requireAuth } from "../middlewares/requireAuth";
-import { sql } from "drizzle-orm";
+import { asyncHandler } from "../utils/asyncHandler";
 
 const router: IRouter = Router();
 
-router.get("/listings/:id/comments", async (req, res): Promise<void> => {
+router.get("/listings/:id/comments", asyncHandler(async (req, res) => {
   const params = GetListingCommentsParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -26,9 +26,9 @@ router.get("/listings/:id/comments", async (req, res): Promise<void> => {
     .orderBy(asc(commentsTable.createdAt));
 
   res.json(comments.map(mapComment));
-});
+}));
 
-router.post("/listings/:id/comments", requireAuth, async (req, res): Promise<void> => {
+router.post("/listings/:id/comments", requireAuth, asyncHandler(async (req, res) => {
   const params = CreateCommentParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -73,9 +73,9 @@ router.post("/listings/:id/comments", requireAuth, async (req, res): Promise<voi
     .where(eq(listingsTable.id, params.data.id));
 
   res.status(201).json(mapComment(comment));
-});
+}));
 
-router.delete("/comments/:id", requireAuth, async (req, res): Promise<void> => {
+router.delete("/comments/:id", requireAuth, asyncHandler(async (req, res) => {
   const params = DeleteCommentParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -107,7 +107,7 @@ router.delete("/comments/:id", requireAuth, async (req, res): Promise<void> => {
     .where(eq(listingsTable.id, comment.listingId));
 
   res.sendStatus(204);
-});
+}));
 
 function mapComment(c: typeof commentsTable.$inferSelect) {
   return {
@@ -117,7 +117,7 @@ function mapComment(c: typeof commentsTable.$inferSelect) {
     authorUsername: c.authorUsername,
     authorAvatarUrl: c.authorAvatarUrl,
     content: c.content,
-    createdAt: c.createdAt.toISOString(),
+    createdAt: c.createdAt,
   };
 }
 

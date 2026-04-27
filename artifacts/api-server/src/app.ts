@@ -1,4 +1,3 @@
-import "express-async-errors"; // must be first — patches Express 4 to catch async route errors
 import express, { type Express, type Request, type Response, type NextFunction } from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
