@@ -37,33 +37,34 @@ const FALLBACK_CATEGORIES = [
 ];
 
 const POPULAR_GAMES = [
-  // PC / MMO
-  "Valorant","CS2","League of Legends","Dota 2","World of Warcraft","World of Warcraft Classic",
-  "Final Fantasy XIV","Diablo IV","Diablo III","Path of Exile","Path of Exile 2","Lost Ark",
-  "New World: Aeternum","Elder Scrolls Online","Black Desert Online","Albion Online",
-  "RuneScape","Old School RuneScape","Throne and Liberty","Lineage W","MapleStory",
-  "Ragnarok Online","Guild Wars 2","Star Wars: The Old Republic","Neverwinter",
-  "Blade & Soul","Aion","Perfect World","Mu Online",
-  // PC / Shooter & Battle Royale
-  "Fortnite","Apex Legends","PUBG: Battlegrounds","Overwatch 2","Destiny 2","Warframe",
-  "Tom Clancy's Rainbow Six Siege","Hunt: Showdown 1896","Escape from Tarkov","DayZ",
-  "Rust","ARK: Survival Evolved","ARK: Survival Ascended","The Division 2",
-  "Borderlands 3","Helldivers 2","Arc Raiders",
-  // PC / MOBA & Other
-  "Heroes of the Storm","Smite 2","Predecessor","GTA V","GTA VI","Elden Ring",
-  "Dark Souls III","Monster Hunter: World","Monster Hunter Wilds","Red Dead Redemption 2",
-  "Cyberpunk 2077","Baldur's Gate 3","Hearthstone","Teamfight Tactics","Minecraft","Roblox",
-  "Steam Account",
-  // Mobile
-  "PUBG Mobile","COD Mobile","Free Fire","Mobile Legends: Bang Bang","Honor of Kings",
-  "Clash of Clans","Clash Royale","Brawl Stars","Genshin Impact","Honkai: Star Rail",
-  "Zenless Zone Zero","Wuthering Waves","Pokémon GO","Wild Rift","Arena of Valor",
-  "Diablo Immortal","Rise of Kingdoms","Lords Mobile","AFK Journey","Stumble Guys","Among Us",
-  // Console
-  "FIFA 25","FC 25","NBA 2K25","Madden NFL 25","Call of Duty: Warzone","Call of Duty: Black Ops 6",
-  "God of War: Ragnarök","Hogwarts Legacy","Mortal Kombat 1","Street Fighter 6","Tekken 8",
-  "Dragon Ball: Sparking! Zero","Xbox Game Pass Account","PlayStation Network Account",
-  "Other",
+  "AFK Journey","Aion","Albion Online","Among Us","Apex Legends","Arc Raiders",
+  "ARK: Survival Ascended","ARK: Survival Evolved","Arena of Valor",
+  "Baldur's Gate 3","Blade & Soul","Borderlands 3","Brawl Stars",
+  "Call of Duty: Black Ops 6","Call of Duty: Warzone",
+  "Clash of Clans","Clash Royale","COD Mobile","Coin Master","CS2","Cyberpunk 2077",
+  "Dark Souls III","DayZ","Destiny 2","Diablo III","Diablo IV","Diablo IV (Console)","Diablo Immortal",
+  "Dota 2","Dragon Ball: Sparking! Zero",
+  "Elder Scrolls Online","Elden Ring","Escape from Tarkov",
+  "FC 25","FIFA 25","Final Fantasy XIV","Fortnite","Free Fire",
+  "Game of Sultans","Garena AOV","Genshin Impact","God of War: Ragnarök","GTA V","GTA VI","Guild Wars 2",
+  "Hearthstone","Helldivers 2","Heroes of the Storm","Hogwarts Legacy","Honkai: Star Rail","Honor of Kings",
+  "Hunt: Showdown 1896",
+  "League of Legends","Legends of Runeterra","Lineage W","Lords Mobile","Lost Ark",
+  "Madden NFL 25","Magic: The Gathering Arena","MapleStory","Minecraft","Mobile Legends: Bang Bang",
+  "Monster Hunter Wilds","Monster Hunter: World","Mortal Kombat 1","Mu Online",
+  "NBA 2K25","Neverwinter","New World: Aeternum",
+  "Old School RuneScape","Other","Overwatch 2",
+  "Path of Exile","Path of Exile 2","Perfect World","PlayStation Network Account","Pokémon GO","Predecessor",
+  "PUBG Mobile","PUBG: Battlegrounds",
+  "Ragnarok Online","Ragnarok X: Next Generation","Red Dead Redemption 2","Rise of Kingdoms","Roblox","RuneScape","Rust",
+  "Smite 2","Spider-Man 2","Star Wars: The Old Republic","State of Survival","Steam Account",
+  "Street Fighter 6","Stumble Guys",
+  "Teamfight Tactics","Tekken 8","The Division 2","The Last of Us Part II","Throne and Liberty",
+  "Tom Clancy's Rainbow Six Siege",
+  "VALORANT: The Game (Mobile)","Valorant",
+  "Warframe","Whiteout Survival","Wild Rift","World of Warcraft","World of Warcraft Classic","Wuthering Waves",
+  "Xbox Game Pass Account",
+  "Zenless Zone Zero",
 ];
 
 function resizeAndEncodeImage(file: File, maxPx = 1200): Promise<string> {
