@@ -37,17 +37,33 @@ const FALLBACK_CATEGORIES = [
 ];
 
 const POPULAR_GAMES = [
-  "Valorant", "League of Legends", "World of Warcraft", "Diablo IV",
-  "Fortnite", "CS2", "Apex Legends", "Dota 2", "Path of Exile",
-  "Final Fantasy XIV", "Destiny 2", "Call of Duty", "Overwatch 2",
-  "Elder Scrolls Online", "New World", "Lost Ark", "Genshin Impact",
-  "Honkai: Star Rail", "Roblox", "Minecraft", "Rust", "ARK: Survival Evolved",
-  "GTA V", "Red Dead Redemption 2", "FIFA 25", "NBA 2K25",
-  "Elden Ring", "Dark Souls III", "Monster Hunter: World",
-  "Black Desert Online", "Albion Online", "RuneScape", "Old School RuneScape",
-  "Throne and Liberty", "Lineage W", "MapleStory", "Ragnarok Online",
-  "Pokémon GO", "Clash of Clans", "Mobile Legends", "PUBG Mobile",
-  "Free Fire", "Brawl Stars", "Candy Crush", "Other"
+  // PC / MMO
+  "Valorant","CS2","League of Legends","Dota 2","World of Warcraft","World of Warcraft Classic",
+  "Final Fantasy XIV","Diablo IV","Diablo III","Path of Exile","Path of Exile 2","Lost Ark",
+  "New World: Aeternum","Elder Scrolls Online","Black Desert Online","Albion Online",
+  "RuneScape","Old School RuneScape","Throne and Liberty","Lineage W","MapleStory",
+  "Ragnarok Online","Guild Wars 2","Star Wars: The Old Republic","Neverwinter",
+  "Blade & Soul","Aion","Perfect World","Mu Online",
+  // PC / Shooter & Battle Royale
+  "Fortnite","Apex Legends","PUBG: Battlegrounds","Overwatch 2","Destiny 2","Warframe",
+  "Tom Clancy's Rainbow Six Siege","Hunt: Showdown 1896","Escape from Tarkov","DayZ",
+  "Rust","ARK: Survival Evolved","ARK: Survival Ascended","The Division 2",
+  "Borderlands 3","Helldivers 2","Arc Raiders",
+  // PC / MOBA & Other
+  "Heroes of the Storm","Smite 2","Predecessor","GTA V","GTA VI","Elden Ring",
+  "Dark Souls III","Monster Hunter: World","Monster Hunter Wilds","Red Dead Redemption 2",
+  "Cyberpunk 2077","Baldur's Gate 3","Hearthstone","Teamfight Tactics","Minecraft","Roblox",
+  "Steam Account",
+  // Mobile
+  "PUBG Mobile","COD Mobile","Free Fire","Mobile Legends: Bang Bang","Honor of Kings",
+  "Clash of Clans","Clash Royale","Brawl Stars","Genshin Impact","Honkai: Star Rail",
+  "Zenless Zone Zero","Wuthering Waves","Pokémon GO","Wild Rift","Arena of Valor",
+  "Diablo Immortal","Rise of Kingdoms","Lords Mobile","AFK Journey","Stumble Guys","Among Us",
+  // Console
+  "FIFA 25","FC 25","NBA 2K25","Madden NFL 25","Call of Duty: Warzone","Call of Duty: Black Ops 6",
+  "God of War: Ragnarök","Hogwarts Legacy","Mortal Kombat 1","Street Fighter 6","Tekken 8",
+  "Dragon Ball: Sparking! Zero","Xbox Game Pass Account","PlayStation Network Account",
+  "Other",
 ];
 
 function resizeAndEncodeImage(file: File, maxPx = 1200): Promise<string> {
