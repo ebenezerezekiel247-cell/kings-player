@@ -3,15 +3,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useLocation } from "wouter";
 import { useRef, useState } from "react";
-import { useCreateListing, useGetCategories, getGetMyListingsQueryKey, getGetListingsQueryKey } from "@workspace/api-client-react";
+import { useCreateListing, useGetCategories, useGetGames, getGetMyListingsQueryKey, getGetListingsQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Show } from "@clerk/react";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Crown, Lock, ImagePlus, X } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { ArrowLeft, Crown, Lock, ImagePlus, X, ChevronsUpDown, Check } from "lucide-react";
 
 const createSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters").max(100),
@@ -74,8 +75,14 @@ export default function CreateListingPage() {
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
   const { data: categories } = useGetCategories();
+  const { data: gamesData } = useGetGames();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [gameOpen, setGameOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const gameOptions = gamesData
+    ? gamesData.map((g) => g.name)
+    : POPULAR_GAMES;
 
   const createListing = useCreateListing({
     mutation: {
@@ -167,18 +174,46 @@ export default function CreateListingPage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Game</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger data-testid="select-game">
-                          <SelectValue placeholder="Select game" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {POPULAR_GAMES.map((g) => (
-                          <SelectItem key={g} value={g}>{g}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Popover open={gameOpen} onOpenChange={setGameOpen}>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <button
+                            type="button"
+                            role="combobox"
+                            data-testid="select-game"
+                            className={`flex w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${!field.value ? "text-muted-foreground" : "text-foreground"}`}
+                          >
+                            {field.value || "Select game"}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-full p-0" align="start">
+                        <Command>
+                          <CommandInput placeholder="Search game..." />
+                          <CommandList>
+                            <CommandEmpty>No game found.</CommandEmpty>
+                            <CommandGroup>
+                              {gameOptions.map((g) => (
+                                <CommandItem
+                                  key={g}
+                                  value={g}
+                                  onSelect={() => {
+                                    field.onChange(g);
+                                    setGameOpen(false);
+                                  }}
+                                >
+                                  <Check
+                                    className={`mr-2 h-4 w-4 ${field.value === g ? "opacity-100" : "opacity-0"}`}
+                                  />
+                                  {g}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                     <FormMessage />
                   </FormItem>
                 )}
