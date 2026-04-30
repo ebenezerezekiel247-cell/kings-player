@@ -8,11 +8,14 @@
  * The entry file (scripts/vercel-entry.ts) is fully self-contained — it does NOT
  * import from any @workspace/* packages. All schema/route logic is inlined.
  *
- * nodePaths tells esbuild where pnpm installed each package in the workspace,
- * since pnpm does not hoist everything to the root node_modules.
+ * All packages imported by vercel-entry.ts are declared as devDependencies in
+ * the ROOT package.json, so they are available at node_modules/ after pnpm install
+ * regardless of which workspace package also declares them.
  *
  * The footer ensures module.exports IS the handler function (not an object with
  * a .default property), which is required by @vercel/node's CJS calling convention.
+ * Note: we must check module.exports.default (not exports.default) because esbuild
+ * runs `module.exports = __toCommonJS(...)` which detaches exports from module.exports.
  */
 import { build } from "esbuild";
 import path from "path";
@@ -27,18 +30,8 @@ await build({
   bundle: true,
   format: "cjs",
   outfile: path.join(root, "api/index.js"),
-  // pnpm does not hoist packages to the root; we must tell esbuild exactly
-  // where each workspace package installed its dependencies.
-  nodePaths: [
-    // express, cors, @clerk/express, drizzle-orm, pino, pino-http live here
-    path.join(root, "artifacts/api-server/node_modules"),
-    // zod lives here (declared by lib/api-zod)
-    path.join(root, "lib/api-zod/node_modules"),
-    // @libsql/client lives here (declared by lib/db)
-    path.join(root, "lib/db/node_modules"),
-    // fallback: root node_modules for anything hoisted
-    path.join(root, "node_modules"),
-  ],
+  // All required packages are in root node_modules/ (declared in root package.json).
+  // No custom nodePaths needed.
   external: [
     // Native .node addons can never be bundled
     "*.node",
@@ -58,7 +51,7 @@ await build({
   // NOT exports.default. @vercel/node calls module.exports(req, res) directly.
   footer: {
     js: [
-      "// Vercel @vercel/node CJS compatibility: expose handler as module.exports directly.",
+      "// Vercel @vercel/node CJS compat: expose handler as module.exports directly.",
       "if (module.exports && typeof module.exports['default'] === 'function') {",
       "  var _h = module.exports['default'];",
       "  _h.config = module.exports.config || { api: { bodyParser: false } };",

@@ -10,9 +10,16 @@
   },
   "private": true,
   "devDependencies": {
+    "@clerk/express": "^2.1.7",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "cors": "^2",
+    "drizzle-orm": "catalog:",
     "esbuild": "^0.27.3",
+    "express": "^5",
     "prettier": "^3.8.1",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.2",
+    "zod": "catalog:"
   },
   "dependencies": {
     "@libsql/client": "^0.17.3",

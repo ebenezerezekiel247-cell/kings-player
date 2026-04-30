@@ -49337,7 +49337,7 @@ object-assign/index.js:
   @license MIT
   *)
 */
-// Vercel @vercel/node CJS compatibility: expose handler as module.exports directly.
+// Vercel @vercel/node CJS compat: expose handler as module.exports directly.
 if (module.exports && typeof module.exports['default'] === 'function') {
   var _h = module.exports['default'];
   _h.config = module.exports.config || { api: { bodyParser: false } };

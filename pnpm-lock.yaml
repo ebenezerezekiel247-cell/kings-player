@@ -164,15 +164,36 @@ importers:
         specifier: ^0.4.0
         version: 0.4.0
     devDependencies:
+      '@clerk/express':
+        specifier: ^2.1.7
+        version: 2.1.7(express@5.2.1)
+      '@types/cors':
+        specifier: ^2.8.19
+        version: 2.8.19
+      '@types/express':
+        specifier: ^5.0.6
+        version: 5.0.6
+      cors:
+        specifier: ^2
+        version: 2.8.6
+      drizzle-orm:
+        specifier: 'catalog:'
+        version: 0.45.2(@libsql/client@0.17.3)
       esbuild:
-        specifier: ^0.27.3
+        specifier: 0.27.3
         version: 0.27.3
+      express:
+        specifier: ^5
+        version: 5.2.1
       prettier:
         specifier: ^3.8.1
         version: 3.8.1
       typescript:
         specifier: ~5.9.2
         version: 5.9.3
+      zod:
+        specifier: 'catalog:'
+        version: 3.25.76
 
   artifacts/api-server:
     dependencies:
