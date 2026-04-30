@@ -1,5 +1,5 @@
 {
-  "buildCommand": "node scripts/build-vercel-function.mjs && pnpm --filter @workspace/kings-player run build",
+  "buildCommand": "pnpm run typecheck:libs && node scripts/build-vercel-function.mjs && pnpm --filter @workspace/kings-player run build",
   "outputDirectory": "public",
   "installCommand": "pnpm install",
   "framework": null,
