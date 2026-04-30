@@ -227,12 +227,12 @@ export default function BrowsePage() {
 
         {/* Quick game filter buttons (when no game selected) */}
         {!game && !search && !isLoading && games.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-6">
+          <div className="flex overflow-x-auto gap-2 mb-6 pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             {games.slice(0, 8).map((g) => (
               <button
                 key={g}
                 onClick={() => setGame(g)}
-                className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-card border border-card-border hover:border-primary/40 hover:text-primary transition-colors"
+                className="flex shrink-0 items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-card border border-card-border hover:border-primary/40 hover:text-primary transition-colors"
                 data-testid={`button-quick-game-${g.toLowerCase().replace(/\s+/g, "-")}`}
               >
                 <Gamepad2 className="w-3 h-3" />
@@ -241,7 +241,7 @@ export default function BrowsePage() {
             ))}
             <button
               onClick={() => setLocation("/games")}
-              className="text-xs px-3 py-1.5 rounded-full text-muted-foreground hover:text-primary transition-colors"
+              className="shrink-0 text-xs px-3 py-1.5 rounded-full text-muted-foreground hover:text-primary transition-colors"
             >
               View all games →
             </button>
