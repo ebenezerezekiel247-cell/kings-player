@@ -283,6 +283,18 @@ export const GetCategoriesResponseItem = zod.object({
 export const GetCategoriesResponse = zod.array(GetCategoriesResponseItem);
 
 /**
+ * @summary Get all supported games
+ */
+export const GetGamesResponseItem = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  slug: zod.string(),
+  imageUrl: zod.string().nullish(),
+  listingCount: zod.number(),
+});
+export const GetGamesResponse = zod.array(GetGamesResponseItem);
+
+/**
  * @summary Get marketplace stats
  */
 export const GetStatsResponse = zod.object({

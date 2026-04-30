@@ -61,7 +61,7 @@ export interface CreateListingBody {
   description: string;
   price: number;
   game: string;
-  category: string;
+  category?: string;
   /** @nullable */
   imageUrl?: string | null;
   discordUsername: string;
@@ -118,6 +118,15 @@ export interface Category {
   name: string;
   slug: string;
   gameCount: number;
+}
+
+export interface Game {
+  id: number;
+  name: string;
+  slug: string;
+  /** @nullable */
+  imageUrl?: string | null;
+  listingCount: number;
 }
 
 export interface MarketplaceStats {

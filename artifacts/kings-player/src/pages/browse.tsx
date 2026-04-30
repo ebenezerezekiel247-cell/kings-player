@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { useGetListings, useGetCategories, getGetListingsQueryKey } from "@workspace/api-client-react";
+import { useGetListings, useGetCategories, useGetGames, getGetListingsQueryKey } from "@workspace/api-client-react";
 import { ListingCard } from "@/components/ListingCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -57,8 +57,9 @@ export default function BrowsePage() {
     query: { queryKey: getGetListingsQueryKey(queryParams) },
   });
   const { data: categories } = useGetCategories();
+  const { data: gamesData } = useGetGames();
 
-  const games = listings ? [...new Set(listings.map((l) => l.game))].sort() : [];
+  const games = gamesData ? gamesData.map((g) => g.name) : [];
 
   const clearFilters = () => {
     setSearch("");

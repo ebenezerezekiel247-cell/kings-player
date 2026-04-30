@@ -95,7 +95,15 @@ const categoriesTable = sqliteTable("categories", {
   gameCount: integer("game_count").notNull().default(0),
 });
 
-const schema = { listingsTable, usersTable, commentsTable, categoriesTable };
+const gamesTable = sqliteTable("games", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull().unique(),
+  slug: text("slug").notNull().unique(),
+  imageUrl: text("image_url"),
+  listingCount: integer("listing_count").notNull().default(0),
+});
+
+const schema = { listingsTable, usersTable, commentsTable, categoriesTable, gamesTable };
 
 // ─── Database Client (lazy singleton) ─────────────────────────────────────────
 
@@ -747,7 +755,7 @@ app.get(
   }),
 );
 
-// ─── Categories / Stats ────────────────────────────────────────────────────────
+// ─── Categories / Stats / Games ────────────────────────────────────────────────
 
 app.get(
   "/api/categories",
@@ -755,6 +763,15 @@ app.get(
     const db = getDb();
     const categories = await db.select().from(categoriesTable);
     res.json(categories);
+  }),
+);
+
+app.get(
+  "/api/games",
+  asyncHandler(async (_req, res) => {
+    const db = getDb();
+    const games = await db.select().from(gamesTable).orderBy(gamesTable.name);
+    res.json(games);
   }),
 );
 

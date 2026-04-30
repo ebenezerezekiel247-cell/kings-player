@@ -4,6 +4,7 @@ import listingsRouter from "./listings";
 import commentsRouter from "./comments";
 import usersRouter from "./users";
 import categoriesRouter from "./categories";
+import gamesRouter from "./games";
 
 const router: IRouter = Router();
 
@@ -12,5 +13,6 @@ router.use(listingsRouter);
 router.use(commentsRouter);
 router.use(usersRouter);
 router.use(categoriesRouter);
+router.use(gamesRouter);
 
 export default router;

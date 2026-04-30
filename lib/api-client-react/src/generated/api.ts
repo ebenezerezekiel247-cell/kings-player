@@ -21,6 +21,7 @@ import type {
   Comment,
   CreateCommentBody,
   CreateListingBody,
+  Game,
   GetListingsParams,
   HealthStatus,
   Listing,
@@ -1190,6 +1191,71 @@ export function useGetCategories<
   request?: SecondParameter<typeof customFetch>;
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getGetCategoriesQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Get all supported games
+ */
+export const getGetGamesUrl = () => {
+  return `/api/games`;
+};
+
+export const getGames = async (options?: RequestInit): Promise<Game[]> => {
+  return customFetch<Game[]>(getGetGamesUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetGamesQueryKey = () => {
+  return [`/api/games`] as const;
+};
+
+export const getGetGamesQueryOptions = <
+  TData = Awaited<ReturnType<typeof getGames>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<Awaited<ReturnType<typeof getGames>>, TError, TData>;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetGamesQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getGames>>> = ({
+    signal,
+  }) => getGames({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getGames>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetGamesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getGames>>
+>;
+export type GetGamesQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get all supported games
+ */
+
+export function useGetGames<
+  TData = Awaited<ReturnType<typeof getGames>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<Awaited<ReturnType<typeof getGames>>, TError, TData>;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetGamesQueryOptions(options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: QueryKey;

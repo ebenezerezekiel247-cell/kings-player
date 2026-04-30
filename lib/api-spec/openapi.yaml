@@ -18,6 +18,8 @@ tags:
     description: User profile operations
   - name: categories
     description: Category operations
+  - name: games
+    description: Game operations
 paths:
   /healthz:
     get:
@@ -321,6 +323,21 @@ paths:
                 items:
                   $ref: "#/components/schemas/Category"
 
+  /games:
+    get:
+      operationId: getGames
+      tags: [games]
+      summary: Get all supported games
+      responses:
+        "200":
+          description: List of games
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Game"
+
   /stats:
     get:
       operationId: getStats
@@ -553,6 +570,25 @@ components:
         - name
         - slug
         - gameCount
+
+    Game:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        imageUrl:
+          type: ["string", "null"]
+        listingCount:
+          type: integer
+      required:
+        - id
+        - name
+        - slug
+        - listingCount
 
     MarketplaceStats:
       type: object

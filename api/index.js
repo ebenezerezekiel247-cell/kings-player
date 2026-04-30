@@ -48550,7 +48550,14 @@ var categoriesTable = sqliteTable("categories", {
   slug: text("slug").notNull().unique(),
   gameCount: integer("game_count").notNull().default(0)
 });
-var schema = { listingsTable, usersTable, commentsTable, categoriesTable };
+var gamesTable = sqliteTable("games", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull().unique(),
+  slug: text("slug").notNull().unique(),
+  imageUrl: text("image_url"),
+  listingCount: integer("listing_count").notNull().default(0)
+});
+var schema = { listingsTable, usersTable, commentsTable, categoriesTable, gamesTable };
 var _db = null;
 function getDb() {
   if (_db) return _db;
@@ -49016,6 +49023,14 @@ app.get(
     const db = getDb();
     const categories = await db.select().from(categoriesTable);
     res.json(categories);
+  })
+);
+app.get(
+  "/api/games",
+  asyncHandler(async (_req, res) => {
+    const db = getDb();
+    const games = await db.select().from(gamesTable).orderBy(gamesTable.name);
+    res.json(games);
   })
 );
 app.get(
