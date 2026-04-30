@@ -153,12 +153,15 @@ export default function BrowsePage() {
           <div className="mb-6 p-4 rounded-xl bg-card border border-card-border flex flex-wrap gap-4">
             <div className="flex-1 min-w-40">
               <label className="text-xs text-muted-foreground mb-1 block">Category</label>
-              <Select value={category} onValueChange={setCategory}>
+              <Select
+                value={category || "__all__"}
+                onValueChange={(v) => setCategory(v === "__all__" ? "" : v)}
+              >
                 <SelectTrigger data-testid="select-category">
                   <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
+                  <SelectItem value="__all__">All Categories</SelectItem>
                   {categories?.map((cat) => (
                     <SelectItem key={cat.id} value={cat.slug}>
                       {cat.name}
@@ -169,12 +172,15 @@ export default function BrowsePage() {
             </div>
             <div className="flex-1 min-w-40">
               <label className="text-xs text-muted-foreground mb-1 block">Game</label>
-              <Select value={game} onValueChange={setGame}>
+              <Select
+                value={game || "__all__"}
+                onValueChange={(v) => setGame(v === "__all__" ? "" : v)}
+              >
                 <SelectTrigger data-testid="select-game">
                   <SelectValue placeholder="All Games" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Games</SelectItem>
+                  <SelectItem value="__all__">All Games</SelectItem>
                   {games.map((g) => (
                     <SelectItem key={g} value={g}>
                       {g}
